@@ -7,22 +7,37 @@ trigger:
 - master
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
 steps:
-- task: MSBuild@1
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
   inputs:
-    solution: '**/*.sln'
-    clean: true
-    maximumCpuCount: true
-    restoreNugetPackages: true
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '$(agent.builddirectory)\s'
-    Contents: '**'
-    TargetFolder: '$(build.artifactstagingdirectory)'
-    OverWrite: true
+    SourceFolder: '$(Build.SourcesDirectory)'
+    Contents: '**/$(BuildConfiguration)/**/?(*.exe|*.dll|*.pdb|*.config)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/bin'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
 
 - task: PublishBuildArtifacts@1
   inputs:
