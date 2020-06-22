@@ -27,3 +27,21 @@ steps:
     msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+
+- task: DownloadBuildArtifacts@0
+  inputs:
+    buildType: 'specific'
+    project: '5d04e710-1bca-4e01-9dab-d8ad8dbac83b'
+    pipeline: '1'
+    buildVersionToDownload: 'latest'
+    downloadType: 'single'
+    artifactName: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    downloadPath: '$(System.ArtifactsDirectory)'
