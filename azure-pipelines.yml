@@ -43,5 +43,5 @@ steps:
     pipeline: '1'
     buildVersionToDownload: 'latest'
     downloadType: 'single'
-    artifactName: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+    artifactName: '$(Build.ArtifactStagingDirectory)\$(Build.BuildId).zip'
     downloadPath: '$(System.ArtifactsDirectory)'
